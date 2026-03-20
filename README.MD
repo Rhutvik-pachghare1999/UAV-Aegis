@@ -4,6 +4,46 @@
 [![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+
+---
+
+## 🏗️ System Architecture & Data Flow (DFD)
+
+The following flowchart illustrates the end-to-end intelligence pipeline from raw sensor acquisition to predictive health monitoring:
+
+```mermaid
+graph TD
+    A[UAV Propeller/Motor] -->|High-Freq Vibration| B(Raw Sensor Data: Acc/Gyro)
+    B --> C{Pipeline Initialization}
+    
+    subgraph "Data Engineering"
+    C --> D[build_ml_dataset_v2.py]
+    D -->|Sliding Window| E[Signal Segmentation]
+    E --> F[Augmentation: augment_dataset.py]
+    F -->|Noise/Shift/Warp| G[(ML-Ready Dataset)]
+    end
+    
+    subgraph "Deep Learning Engine"
+    G --> H[cnn_classifier.py: 1D-CNN]
+    H -->|Feature Extraction| I[propeller_lstm.py: RUL]
+    H -->|Classification| J[Fault Identification]
+    end
+    
+    subgraph "Industrial Operations"
+    J --> K[dashboard.py: Real-time UI]
+    I --> K
+    K --> L{Fleet Health Decision}
+    L -->|Alert| M[Maintenance Required]
+    L -->|Nominal| N[Mission Continue]
+    end
+
+    style A fill:#f96,stroke:#333,stroke-width:2px
+    style G fill:#bbf,stroke:#333,stroke-width:2px
+    style K fill:#dfd,stroke:#333,stroke-width:2px
+```
+
+---
+
 **UAV Aegis** is an industrial-grade diagnostic and prognostic suite designed to detect, classify, and predict mechanical failures in UAV propellers and motors using high-frequency vibration signatures and Deep Learning.
 
 ---
