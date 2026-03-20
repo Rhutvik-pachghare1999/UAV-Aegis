@@ -1,0 +1,42 @@
+# UAV Aegis: Operational Command Guide
+
+Follow these commands in order to re-run the pipeline or launch the diagnostic suite.
+
+### 1. Dataset Inspection
+Verify the HDF5 dataset integrity and visualize raw signals.
+```powershell
+py scripts/inspect_dataset_and_plot.py --h5 scripts/data_out/ml_dataset_v2_auto.h5
+```
+
+### 2. Model Training
+Train the 2D-CNN model for 10000 epochs (standard stress test).
+```powershell
+py scripts/train_cnn.py --data scripts/data_out/ml_dataset_v2_auto.h5 --epochs 10000
+```
+
+### 3. Smoke Test
+Perform a quick inference check on the trained model.
+```powershell
+py scripts/smoke_test.py --h5 scripts/data_out/ml_dataset_v2_auto.h5 --model scripts/models/cnn_final_best.pth
+```
+
+### 4. Full Evaluation
+Generate a comprehensive classification report and confusion matrix.
+```powershell
+py scripts/eval_classifier.py --h5 scripts/data_out/ml_dataset_v2_auto.h5 --model scripts/models/cnn_final_best.pth
+```
+
+### 5. Training Visualization
+Plot the loss and accuracy curves from the training logs.
+```powershell
+py scripts/plot_training_curves.py --log scripts/logs/train.log
+```
+
+### 6. Launch UAV Aegis v3 Dashboard
+Start the professional industrial diagnostic & prognostic suite.
+```powershell
+py -m streamlit run scripts/dashboard.py
+```
+
+---
+Refer to README.MD for detailed architecture and problem/solution context.
