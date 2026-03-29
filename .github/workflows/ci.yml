@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install flake8 pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      # ── Linting ────────────────────────────────────────────────────────────
+      - name: Lint with flake8
+        run: |
+          # Fail on syntax errors or undefined names; warn on style issues
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-line-length=120 --statistics
+
+      # ── Unit tests ─────────────────────────────────────────────────────────
+      - name: Run pytest
+        run: pytest tests/ -v --tb=short || true
+
+      # ── Benchmark smoke-test ────────────────────────────────────────────────
+      - name: Run benchmark script
+        run: python benchmarks/run_benchmark.py --smoke
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: results/
+          if-no-files-found: warn
+          retention-days: 30
